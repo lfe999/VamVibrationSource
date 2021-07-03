@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -52,8 +53,7 @@ namespace LFE
                 RigidbodyVibrator.MIN_VIB_STRENGTH, RigidbodyVibrator.MAX_VIB_STRENGTH, constrain: false);
             RegisterFloat(vibrationStrengthZStorable);
 
-            var rigidBodyNames = GetRigidBodies().Select(r => r.name).ToList();
-            rigidBodyNames.Insert(0, String.Empty);
+            var rigidBodyNames = GetRigidBodyMenuItems();
             vibrationSourceStorable = new JSONStorableStringChooser(
                 "Vibration Source",
                 rigidBodyNames,
@@ -66,7 +66,7 @@ namespace LFE
 
             vibrationDistanceStorable = new JSONStorableFloat(
                 "Vibration Distance",
-                20,
+                5,
                 (float val) => {
                     if(selectedVibrator != null) {
                         selectedVibrator.Radius = val / 100;
@@ -97,6 +97,33 @@ namespace LFE
 
             SetSelectedVibrator(vibrationSourceStorable.val);
 
+            // wait for any rigid bodies that might be late arriving (CustomUnityAsset atoms do this)
+            StartCoroutine(WaitForAnyRigidbodies());
+
+        }
+
+        IEnumerator NudgeAtom() {
+            var currentPos = containingAtom.mainController.transform.position;
+            var newPos = new Vector3(currentPos.x + 0.001f, currentPos.y + 0.001f, currentPos.z + 0.001f);
+            yield return new WaitForSeconds(0.05f);
+            containingAtom.mainController.transform.position = newPos;
+            yield return new WaitForSeconds(0.10f);
+            containingAtom.mainController.transform.position = currentPos;
+        }
+
+        IEnumerator WaitForAnyRigidbodies() {
+            var rigidbodies = GetRigidBodies().ToList();
+            while(rigidbodies.Count == 0) {
+                yield return new WaitForSeconds(0.2f);
+                rigidbodies = GetRigidBodies().ToList();
+            }
+            // SuperController.LogMessage("rigid bodies found");
+            if(vibrationSourceStorable != null) {
+                var menuItems = GetRigidBodyMenuItems().ToList();
+                vibrationSourceStorable.choices = menuItems;
+                vibrationSourceStorable.displayChoices = menuItems;
+                SetSelectedVibrator(vibrationSourceStorable.val);
+            }
         }
 
         public void OnDisable() {
@@ -119,7 +146,21 @@ namespace LFE
             }
         }
 
+        private List<string> GetRigidBodyMenuItems() {
+            var rigidBodyNames = GetRigidBodies().Select(r => r.name).ToList();
+            rigidBodyNames.Insert(0, String.Empty);
+            return rigidBodyNames;
+        }
+
         private IEnumerable<Rigidbody> GetRigidBodies() {
+            var rescale = containingAtom.reParentObject.Find("object/rescaleObject");
+            // SuperController.LogMessage($"rescale: {rescale}");
+            foreach(var c in rescale.GetComponentsInChildren<Rigidbody>()) {
+                // SuperController.LogMessage($"{c}");
+            }
+            // foreach(var c in containingAtom.GetComponentsInChildren<Component>()) {
+            //     SuperController.LogMessage($"{c}");
+            // }
             foreach(var rb in containingAtom.GetComponentsInChildren<Rigidbody>()) {
                 yield return rb;
             }
@@ -140,10 +181,12 @@ namespace LFE
                 v.PerSecond = vibrationFrequencyStorable.val;
                 v.Radius = vibrationDistanceStorable.val / 100;
                 selectedVibrator = v;
+
+                // move just a bit to trigger collision on load
+                StartCoroutine(NudgeAtom());
             }
         }
     }
-
 
     public class RigidbodyVibrator : MonoBehaviour {
 
