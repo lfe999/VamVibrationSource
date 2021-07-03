@@ -1,41 +1,19 @@
-# Virt-A-Mate Plugin Template for VSCode
+# Vibration Source Plugin for Virt-A-Mate
 
-## What you will need
+Uses forces to simulate a vibration force on the object this plugin is attached to.
 
-- [Visual Studio Code](https://code.visualstudio.com/) to edit your plugins
-- [.NET Core SDK](https://dotnet.microsoft.com/download) to compile your code (optional)
-- [.NET Framework 3.5 Targeting Pack](https://stackoverflow.com/a/47621616/154480) (you might already have this)
-- [Virt-A-Mate](https://www.patreon.com/meshedvr/) to use your plugins
+## Installing
 
-## Get this template
+Requires VaM 1.19 or newer.
 
-First of all, decide what your author name will be, and what your plugin name will be. From now on, replace `Author` and `MyPlugin` by your selected name. I suggest your keep those simple without any special characters.
+Download `LFE.VibrationSource.(version).var` from [Releases](https://github.com/lfe999/VamVibrationSource/releases)
 
-- If you have a GitHub account (recommended), click on `Use this template` on the [vam-plugin-template](https://github.com/acidbubbles/vam-plugin-template). It will create your own copy. You can also [download](https://github.com/acidbubbles/vam-plugin-template/archive/master.zip) this repository.
-- Clone (or unzip) this repo under `(VaM install path)\Custom\Scripts\Author\MyPlugin`, replacing `Author` and `MyPlugin` by yours, so that the `MyPlugin.cs` is directly under the `MyPlugin` folder.
+Save the `.var` file in the `(VAM_ROOT)\AddonPackages`.
 
-You should now be able to open the project in vscode by using `File`, `Open Folder` and select the `MyPlugin` folder.
+## Quickstart
 
-## Adapt the template
+Add this plugin to an object that you want to be vibrating.  Probably NOT the person.
 
-- Rename the `MyPlugin.cs` and `MyPlugin.csproj` to match your plugin name.
-- Replace in files (<kbd>ctrl</kbd> + <kbd>shift</kbd> + <kbd>h</kbd>) all occurences of `Author` and `MyPlugin` by yours.
-- In `meta.json`, fill in the description (keep `v0.0.0` if you plan on using GitHub Actions), credits, instructions and promotionalLink. You might also want to chage the `licenseType`, if you wish.
-- Replace the content of `README.md` by your own content.
-- Replace the author name in [LICENSE.md](LICENSE.md) file to put your own name (it's all right, you have my blessing!)
+Make sure collision is turned on.
 
-## Validate locally
-
-You can run `dotnet build` in the plugin folder, and it'll show you any compilation errors. This is faster than going in VaM to do so!
-
-## Package var using GitHub Actions
-
-If you use `GitHub`, you can push a tag with the naming convention `v0.0.0`, and it will automatically create a release draft. You can then edit it (e.g. add a description) and publish it.
-
-## Learning about Git
-
-There are tons of references out there, you might want to look at [GitHub Learning Lab](https://lab.github.com/). Learning Git is _really_ worth your time.
-
-## License
-
-[MIT](LICENSE.md)
+Open the plugin UI and change strength settings and stuff.
